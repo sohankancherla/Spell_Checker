@@ -1,8 +1,10 @@
+
 // Implements a dictionary's functionality
 
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <strings.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -24,14 +26,32 @@ node *table[N];
 // Returns true if word is in dictionary, else false
 bool check(const char *word)
 {
-    // TODO
+    unsigned int index = hash(word);
+    node *cursor = table[index];
+
+    while (cursor != NULL)
+    {
+        if (strcasecmp(cursor->word, word) == 0)
+        {
+            return true;
+        }
+        cursor = cursor->next;
+    }
+
     return false;
 }
 
 // Hashes word to a number
 unsigned int hash(const char *word)
 {
-    return ((toupper(word[0]) - 'A') + (toupper(word[1]) - 'A'));
+    int sum = 0;
+    sum += (toupper(word[0]) - 'A') * 26;
+    if (strlen(word) > 1)
+    {
+        sum += toupper(word[1]) - 'A';
+    }
+
+    return sum;
 }
 
 // Loads dictionary into memory, returning true if successful, else false
@@ -55,9 +75,12 @@ bool load(const char *dictionary)
             return false;
         }
         strcpy(n->word, word);
+        n->next = NULL;
         unsigned int index = hash(word);
 
-        if (&table[index] == NULL)
+        node *head = table[index];
+
+        if (head == NULL)
         {
             table[index] = n;
         }
@@ -67,7 +90,6 @@ bool load(const char *dictionary)
             table[index] = n;
         }
         word_count++;
-        free(n);
     }
 
     fclose(file);
@@ -83,6 +105,16 @@ unsigned int size(void)
 // Unloads dictionary from memory, returning true if successful, else false
 bool unload(void)
 {
-    // TODO
-    return false;
+    for (int i = 0; i < N; i++)
+    {
+        node* cursor = table[i];
+        while (cursor != NULL)
+        {
+            node *tmp = cursor;
+            cursor = cursor->next;
+            free(tmp);
+        }
+
+    }
+    return true;
 }
