@@ -1,4 +1,4 @@
-# Spell_Checker
+# Spell Checker
 
 ## Project Description
 
